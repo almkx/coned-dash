@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>ConEd Energy Dashboard</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main>
+<div class="ce">
+  <header class="ce-head" id="summary">
+    <h1 class="ce-h1">Your electricity use and bills</h1>
+    <p class="ce-lede">In <b data-draw="num" data-source="compare" data-field="label" data-row="1" data-fmt="text">—</b> you used <b data-draw="num" data-source="change" data-field="kwh_pct" data-row="0" data-fmt="more">—</b> electricity than in <b data-draw="num" data-source="compare" data-field="label" data-row="0" data-fmt="text">—</b>, and paid <b data-draw="num" data-source="change" data-field="cost_pct" data-row="0" data-fmt="more">—</b>. <span data-draw="verdict"></span><span class="ce-v-use">The average price per kWh changed by only <b data-draw="num" data-source="change" data-field="price_pct" data-row="0" data-fmt="pct">—</b>, so the change in your bills comes mainly from how much electricity you used.</span><span class="ce-v-price" hidden>The average price per kWh changed by <b data-draw="num" data-source="change" data-field="price_pct" data-row="0" data-fmt="pct">—</b>, so rate changes explain much of the difference.</span></p>
+    <p class="ce-source" id="source-line" hidden>From <b id="source-name"></b>: <span id="source-summary"></span>. <button type="button" class="ce-link" id="source-change">Choose a different file</button></p>
+  </header>
+
+  <section class="ce-loader" id="loader" hidden>
+    <p class="ce-loader-msg" id="loader-msg">Choose the CSV of your billing history, downloaded from your Con Edison account, to build the dashboard.</p>
+    <div class="ce-loader-actions">
+      <button type="button" class="ce-btn" id="loader-allow" hidden>Load CSV</button>
+      <button type="button" class="ce-btn ce-btn-quiet" id="loader-pick">Choose CSV</button>
+      <input type="file" id="loader-input" accept=".csv,text/csv" hidden>
+    </div>
+    <p class="ce-loader-hint">You can also drag the file onto this page. The file stays on your computer.</p>
+  </section>
+
+  <div class="ce-tiles" id="tiles">
+    <div class="ce-tile" id="tile-spent">
+      <div class="ce-label">Spent, <span data-draw="num" data-source="compare" data-field="label" data-row="1" data-fmt="text">—</span></div>
+      <div class="ce-v" data-draw="num" data-source="compare" data-field="cost" data-row="1" data-fmt="usd">—</div>
+      <div class="ce-sub"><span data-draw="num" data-source="change" data-field="cost_pct" data-row="0" data-fmt="pct" data-good="down">—</span> vs <span data-draw="num" data-source="compare" data-field="cost" data-row="0" data-fmt="usd">—</span> a year earlier</div>
+    </div>
+    <div class="ce-tile" id="tile-used">
+      <div class="ce-label">Electricity used, <span data-draw="num" data-source="compare" data-field="label" data-row="1" data-fmt="text">—</span></div>
+      <div class="ce-v"><span data-draw="num" data-source="compare" data-field="kwh" data-row="1" data-fmt="int">—</span> <span class="ce-unit">kWh</span></div>
+      <div class="ce-sub"><span data-draw="num" data-source="change" data-field="kwh_pct" data-row="0" data-fmt="pct" data-good="down">—</span> vs <span data-draw="num" data-source="compare" data-field="kwh" data-row="0" data-fmt="int">—</span> kWh a year earlier</div>
+    </div>
+    <div class="ce-tile" id="tile-price">
+      <div class="ce-label">Average price per kWh, <span data-draw="num" data-source="compare" data-field="label" data-row="1" data-fmt="text">—</span></div>
+      <div class="ce-v" data-draw="num" data-source="compare" data-field="price_per_kwh" data-row="1" data-fmt="price">—</div>
+      <div class="ce-sub"><span data-draw="num" data-source="change" data-field="price_pct" data-row="0" data-fmt="pct" data-good="down">—</span> vs <span data-draw="num" data-source="compare" data-field="price_per_kwh" data-row="0" data-fmt="price">—</span> a year earlier</div>
+    </div>
+    <div class="ce-tile" id="tile-season">
+      <div class="ce-label">Summer <span data-draw="num" data-source="season" data-row="0" data-field="year" data-fmt="text">—</span> vs the winter before</div>
+      <div class="ce-v" data-draw="num" data-source="season" data-row="0" data-field="ratio" data-fmt="times">—</div>
+      <div class="ce-sub"><span class="ce-hl" data-draw="num" data-source="season" data-row="0" data-field="ratio_pct" data-fmt="pct">—</span> vs <span data-draw="num" data-source="season" data-row="0" data-field="prev_ratio" data-fmt="times">—</span> a year earlier</div>
+    </div>
+  </div>
+
+  <section class="ce-sec" id="monthly-use">
+    <h2 class="ce-h2">Monthly usage by year</h2>
+    <p class="ce-note">kWh per bill, shown in the month most of its billing period falls in.</p>
+    <div class="ce-chart" data-draw="yoy" id="chart-monthly-use"></div>
+    <p class="ce-note">Year-over-year change ranges from <b data-draw="num" data-source="extremes" data-field="min_pct" data-row="0" data-fmt="pct">—</b> in <b data-draw="num" data-source="extremes" data-field="min_month" data-row="0" data-fmt="text">—</b> to <b data-draw="num" data-source="extremes" data-field="max_pct" data-row="0" data-fmt="pct">—</b> in <b data-draw="num" data-source="extremes" data-field="max_month" data-row="0" data-fmt="text">—</b>.</p>
+    <p class="ce-note ce-yoy-skip" hidden></p>
+  </section>
+
+  <section class="ce-sec" id="use-and-cost">
+    <h2 class="ce-h2">Usage and cost</h2>
+    <div class="ce-chart" data-draw="overlay" id="chart-use-and-cost"></div>
+  </section>
+
+  <section class="ce-sec" id="price">
+    <h2 class="ce-h2">Average price per kWh</h2>
+    <p class="ce-note">Bill total divided by kWh used, so taxes and fixed charges are included.</p>
+    <div class="ce-chart" data-draw="price" id="chart-price"></div>
+    <p class="ce-note">Each extra kWh adds about <b data-draw="num" data-source="fit" data-field="per_kwh" data-row="0" data-fmt="price">—</b> to a bill, and about <b data-draw="num" data-source="fit" data-field="fixed" data-row="0" data-fmt="usd">—</b> of each bill is fixed (estimated from all bills).<span data-draw="fit-why"> The fixed part is why the price per kWh is higher in low-use months.</span></p>
+  </section>
+
+  <section class="ce-sec" id="all-bills">
+    <h2 class="ce-h2">All bills</h2>
+    <div class="ce-tablewrap">
+      <table class="ce-table">
+        <thead>
+          <tr>
+            <th>From</th>
+            <th>To</th>
+            <th class="ce-num">Days</th>
+            <th class="ce-num">kWh</th>
+            <th class="ce-num">kWh/day</th>
+            <th class="ce-num">Cost</th>
+            <th class="ce-num">$/kWh</th>
+          </tr>
+        </thead>
+        <tbody data-draw="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <details id="notes">
+    <summary>How these numbers are worked out</summary>
+    <p>Everything on this page is worked out from the CSV each time the page opens. Only the billing rows are read; the name, address and account lines at the top of the export are ignored. The file is never uploaded. Billing periods include both their first and last day.</p>
+    <p>A bill counts toward the month that holds the middle of its billing period. The year-over-year figures compare the latest year with the year before, using only months that have a bill in both years. The monthly chart draws every year with at least two bills, up to the six most recent.</p>
+    <p>Summer vs winter compares average kWh per day in the latest summer with all three months billed (June–August) against the winter just before it (December–February). Using kWh per day keeps short or long billing periods from skewing the comparison.</p>
+    <p>The average price per kWh is total cost divided by total kWh, so it includes fixed monthly charges and taxes, not only the per-kWh rate.</p>
+  </details>
+</div>
+</main>
+<script src="assets/d3.v7.min.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
